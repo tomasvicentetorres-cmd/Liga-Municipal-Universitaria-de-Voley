@@ -1819,13 +1819,45 @@ function renderPartido(p, fecha) {
     parcialesList.appendChild(noSet);
   }
 
-  // Nota partido
-  if (p.nota) {
-    const notaP = document.createElement('div');
-    notaP.style.cssText = 'font-size:0.7rem;color:var(--amarillo);font-weight:600;margin-top:4px;';
-    notaP.textContent = '📌 ' + p.nota;
-    parcialesList.appendChild(notaP);
+  // ── PINCHE DE NOTA (siempre visible) ──────────────────────────────────
+  const notaWrap = document.createElement('div');
+  notaWrap.style.cssText = 'margin-top:5px;display:flex;align-items:flex-start;gap:4px;';
+
+  if (modoEdicion) {
+    // En modo edición: input de texto editable
+    const notaInput = document.createElement('input');
+    notaInput.type = 'text';
+    notaInput.value = p.nota || '';
+    notaInput.placeholder = 'Agregar observación...';
+    notaInput.style.cssText = 'flex:1;font-size:0.68rem;color:var(--azul);border:none;border-bottom:1px dashed var(--dorado);background:transparent;padding:1px 3px;min-width:0;';
+    notaInput.oninput = (e) => { p.nota = e.target.value.trim() || undefined; };
+    const pinIcon = document.createElement('span');
+    pinIcon.textContent = '📌';
+    pinIcon.style.cssText = 'font-size:0.72rem;flex-shrink:0;margin-top:1px;';
+    notaWrap.appendChild(pinIcon);
+    notaWrap.appendChild(notaInput);
+  } else {
+    // En modo lectura: botón pinche que abre/cierra la nota inline
+    const pinBtn = document.createElement('button');
+    pinBtn.style.cssText = `background:none;border:none;cursor:pointer;font-size:0.8rem;padding:0 2px;opacity:${p.nota ? '1' : '0.28'};flex-shrink:0;line-height:1;`;
+    pinBtn.title = p.nota ? p.nota : 'Sin observaciones';
+    pinBtn.textContent = '📌';
+
+    const notaTexto = document.createElement('span');
+    notaTexto.style.cssText = `font-size:0.68rem;color:var(--amarillo);font-weight:600;display:${p.nota ? 'inline' : 'none'};`;
+    notaTexto.textContent = p.nota || '';
+
+    pinBtn.onclick = () => {
+      const visible = notaTexto.style.display !== 'none';
+      notaTexto.style.display = visible ? 'none' : 'inline';
+      pinBtn.style.opacity = (!visible || p.nota) ? '1' : '0.28';
+    };
+
+    notaWrap.appendChild(pinBtn);
+    notaWrap.appendChild(notaTexto);
   }
+
+  parcialesList.appendChild(notaWrap);
 
   parcialesWrap.appendChild(parcialesList);
   medio.appendChild(parcialesWrap);
