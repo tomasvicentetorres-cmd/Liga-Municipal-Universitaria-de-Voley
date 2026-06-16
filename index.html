@@ -566,38 +566,39 @@
   /* RESPONSIVE */
   @media(max-width: 700px) {
     /* Header compacto */
-    header { padding: 12px 12px 10px; }
-    .header-inner { gap: 10px; }
-    .header-logo { width: 40px; height: 40px; }
-    .header-texto h1 { font-size: 1.05rem; }
-    .header-texto p { font-size: 0.72rem; }
+    header { padding: 8px 10px 8px; }
+    .header-inner { gap: 8px; }
+    .header-logo { display: none; } /* ocultar logo en mobile */
+    .header-texto h1 { font-size: 0.92rem; line-height: 1.2; }
+    .header-texto p { font-size: 0.68rem; margin-top: 1px; }
 
     /* Botones del header en fila compacta */
     .header-tools {
-      gap: 6px;
-      margin-top: 10px;
+      gap: 5px;
+      margin-top: 8px;
+      flex-wrap: wrap;
     }
     .btn {
-      padding: 7px 10px;
-      font-size: 0.75rem;
-      border-radius: 6px;
+      padding: 6px 9px;
+      font-size: 0.72rem;
+      border-radius: 5px;
     }
-    .btn-guardar { padding: 7px 12px; }
-    .lock-badge { font-size: 0.7rem; padding: 4px 8px; }
+    .btn-guardar { padding: 6px 10px; }
+    .lock-badge { font-size: 0.68rem; padding: 4px 7px; }
 
     /* Filtros en columna */
     .filtros {
       flex-direction: column;
       align-items: flex-start;
-      gap: 6px;
-      margin-top: 8px;
+      gap: 5px;
+      margin-top: 7px;
     }
-    .filtros label { font-size: 0.75rem; }
+    .filtros label { font-size: 0.72rem; }
     .filtros input, .filtros select {
       width: 100%;
-      padding: 7px 10px;
-      font-size: 0.85rem;
-      border-radius: 6px;
+      padding: 6px 9px;
+      font-size: 0.82rem;
+      border-radius: 5px;
     }
 
     /* Tabs táctiles */
@@ -605,85 +606,86 @@
     .tab {
       flex: 1;
       text-align: center;
-      padding: 12px 4px;
-      font-size: 0.78rem;
+      padding: 11px 4px;
+      font-size: 0.75rem;
     }
 
     /* Main */
-    main { padding: 12px 8px; }
+    main { padding: 10px 6px; }
 
     /* Fecha bloque */
-    .fecha-header { padding: 10px 12px; gap: 8px; }
-    .fecha-titulo-edit { font-size: 0.85rem; width: 100%; }
+    .fecha-header { padding: 8px 10px; gap: 6px; }
+    .fecha-titulo-edit { font-size: 0.82rem; width: 100%; }
     .fecha-body {
-      padding: 8px;
-      gap: 8px;
-      grid-template-columns: 1fr; /* una sola columna */
+      padding: 7px;
+      gap: 7px;
+      grid-template-columns: 1fr;
     }
 
     /* Cards de partido más legibles */
     .partido-card { cursor: default; }
-    .partido-top { flex-wrap: wrap; gap: 6px; padding: 8px 10px; }
-    .part-num { font-size: 0.7rem; }
-    .part-hora-edit { width: 54px; font-size: 0.78rem; }
-    .part-sede-edit { font-size: 0.75rem; }
+    .partido-top { flex-wrap: wrap; gap: 5px; padding: 7px 9px; }
+    .part-num { font-size: 0.68rem; }
+    .part-hora-edit { width: 52px; font-size: 0.76rem; }
+    .part-sede-edit { font-size: 0.72rem; }
 
     /* Equipos en columna centrada */
     .partido-equipos {
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
     }
     .equipo-edit {
       text-align: center !important;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       width: 100%;
       border-bottom: 1px solid var(--gris-borde);
     }
     .vs-label {
-      font-size: 0.65rem;
+      font-size: 0.63rem;
       color: var(--gris-texto);
     }
 
     /* Resultado más grande para tocar */
-    .resultado-row { margin-top: 8px; justify-content: center; gap: 8px; }
+    .resultado-row { margin-top: 7px; justify-content: center; gap: 7px; }
     .resultado-input {
-      width: 44px;
-      font-size: 1rem;
-      padding: 4px;
+      width: 42px;
+      font-size: 0.98rem;
+      padding: 3px;
     }
-    .set-sep { font-size: 1rem; }
+    .set-sep { font-size: 0.98rem; }
 
     /* Parciales compactos */
-    .parciales-wrap { margin-top: 8px; }
-    .parcial-input { width: 38px; font-size: 0.8rem; }
+    .parciales-wrap { margin-top: 7px; }
+    .parcial-input { width: 36px; font-size: 0.78rem; }
 
     /* Tabla posiciones con scroll */
     .tabla-pos { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .tabla-pos table { min-width: 560px; }
-    .tabla-pos th, .tabla-pos td { padding: 6px 8px; font-size: 0.72rem; }
+    .tabla-pos table { min-width: 540px; }
+    .tabla-pos th, .tabla-pos td { padding: 5px 7px; font-size: 0.7rem; }
 
     /* Equipos grid */
-    .equipos-grid { grid-template-columns: 1fr; gap: 16px; }
-    .equipos-tabla table { min-width: 320px; }
-    .equipos-tabla th, .equipos-tabla td { padding: 6px 10px; font-size: 0.78rem; }
+    .equipos-grid { grid-template-columns: 1fr; gap: 14px; }
+    .equipos-tabla { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .equipos-tabla table { min-width: 300px; }
+    .equipos-tabla th, .equipos-tabla td { padding: 5px 9px; font-size: 0.76rem; }
 
     /* Rename panel */
-    .rename-panel { padding: 14px; }
+    .rename-panel { padding: 12px; }
     .rename-form { flex-direction: column; }
     .rename-field { min-width: 100%; }
     .btn-rename { width: 100%; text-align: center; }
 
     /* Modal más ancho */
-    .modal { padding: 18px; width: 95%; }
+    .modal { padding: 16px; width: 95%; }
 
-    /* Toast en la parte de abajo centrado */
-    #toast { right: 50%; transform: translateX(50%) translateY(100px); }
+    /* Toast centrado abajo */
+    #toast { right: 50%; transform: translateX(50%) translateY(100px); left: auto; }
     #toast.show { transform: translateX(50%) translateY(0); }
 
     /* Acciones de fecha en mobile */
-    .fecha-actions { flex-wrap: wrap; gap: 5px; }
-    .btn-fecha { padding: 5px 10px; font-size: 0.72rem; }
+    .fecha-actions { flex-wrap: wrap; gap: 4px; }
+    .btn-fecha { padding: 4px 9px; font-size: 0.7rem; }
   }
 
   /* Tablet intermedia */
@@ -2554,7 +2556,70 @@ document.addEventListener('DOMContentLoaded', function() {
   const saved = localStorage.getItem('liga2026_fixture');
   if (saved) { try { fixture = JSON.parse(saved); } catch(e){} }
   renderFixture();
+  scrollAProximaFecha();
 });
+
+function parseFecha(str) {
+  // formato "DD/MM/YYYY"
+  const parts = str.split('/');
+  if (parts.length !== 3) return null;
+  return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+}
+
+function scrollAProximaFecha() {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  // Buscar el día de la semana actual (0=dom,1=lun,...,6=sab)
+  const dow = hoy.getDay(); // 0=dom
+
+  // Calcular el jueves de esta semana
+  // Si hoy es lunes(1), martes(2), miércoles(3): próximo jueves de esta semana
+  // Si hoy es jueves(4) o viernes(5): mostrar esta semana
+  // Si hoy es sábado(6) o domingo(0): mostrar la semana siguiente
+  let diasAlJueves;
+  if (dow === 0) {
+    diasAlJueves = 4; // domingo → jueves siguiente
+  } else if (dow === 6) {
+    diasAlJueves = 5; // sábado → jueves siguiente
+  } else {
+    diasAlJueves = 4 - dow; // lun-vier: cuántos días faltan para el jueves
+    if (diasAlJueves < 0) diasAlJueves = 7 + diasAlJueves; // si ya pasó el jueves de la semana
+  }
+
+  const juevesSemana = new Date(hoy);
+  juevesSemana.setDate(hoy.getDate() + diasAlJueves);
+  juevesSemana.setHours(0, 0, 0, 0);
+
+  const viernesSemana = new Date(juevesSemana);
+  viernesSemana.setDate(juevesSemana.getDate() + 1);
+
+  // Encontrar la fecha del fixture más cercana a partir del jueves de esta semana
+  let fechaTarget = null;
+  let menorDiff = Infinity;
+
+  fixture.forEach(f => {
+    const d = parseFecha(f.fecha);
+    if (!d) return;
+    d.setHours(0, 0, 0, 0);
+    const diff = d - juevesSemana;
+    if (diff >= 0 && diff < menorDiff) {
+      menorDiff = diff;
+      fechaTarget = f.id;
+    }
+  });
+
+  if (fechaTarget) {
+    setTimeout(() => {
+      const el = document.getElementById('fecha-' + fechaTarget);
+      if (el) {
+        const topbarH = document.getElementById('topbar').offsetHeight;
+        const y = el.getBoundingClientRect().top + window.scrollY - topbarH - 12;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 150);
+  }
+}
 </script>
 </head>
 <body>
