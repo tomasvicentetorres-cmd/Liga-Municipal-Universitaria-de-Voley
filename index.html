@@ -565,10 +565,134 @@
 
   /* RESPONSIVE */
   @media(max-width: 700px) {
-    main { padding: 14px 10px; }
-    header { padding: 16px 14px 12px; }
-    .fecha-body { padding: 8px; gap: 8px; }
-    .tabs { padding: 0 10px; }
+    /* Header compacto */
+    header { padding: 12px 12px 10px; }
+    .header-inner { gap: 10px; }
+    .header-logo { width: 40px; height: 40px; }
+    .header-texto h1 { font-size: 1.05rem; }
+    .header-texto p { font-size: 0.72rem; }
+
+    /* Botones del header en fila compacta */
+    .header-tools {
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .btn {
+      padding: 7px 10px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+    .btn-guardar { padding: 7px 12px; }
+    .lock-badge { font-size: 0.7rem; padding: 4px 8px; }
+
+    /* Filtros en columna */
+    .filtros {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .filtros label { font-size: 0.75rem; }
+    .filtros input, .filtros select {
+      width: 100%;
+      padding: 7px 10px;
+      font-size: 0.85rem;
+      border-radius: 6px;
+    }
+
+    /* Tabs táctiles */
+    .tabs { padding: 0; }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px 4px;
+      font-size: 0.78rem;
+    }
+
+    /* Main */
+    main { padding: 12px 8px; }
+
+    /* Fecha bloque */
+    .fecha-header { padding: 10px 12px; gap: 8px; }
+    .fecha-titulo-edit { font-size: 0.85rem; width: 100%; }
+    .fecha-body {
+      padding: 8px;
+      gap: 8px;
+      grid-template-columns: 1fr; /* una sola columna */
+    }
+
+    /* Cards de partido más legibles */
+    .partido-card { cursor: default; }
+    .partido-top { flex-wrap: wrap; gap: 6px; padding: 8px 10px; }
+    .part-num { font-size: 0.7rem; }
+    .part-hora-edit { width: 54px; font-size: 0.78rem; }
+    .part-sede-edit { font-size: 0.75rem; }
+
+    /* Equipos en columna centrada */
+    .partido-equipos {
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .equipo-edit {
+      text-align: center !important;
+      font-size: 0.88rem;
+      width: 100%;
+      border-bottom: 1px solid var(--gris-borde);
+    }
+    .vs-label {
+      font-size: 0.65rem;
+      color: var(--gris-texto);
+    }
+
+    /* Resultado más grande para tocar */
+    .resultado-row { margin-top: 8px; justify-content: center; gap: 8px; }
+    .resultado-input {
+      width: 44px;
+      font-size: 1rem;
+      padding: 4px;
+    }
+    .set-sep { font-size: 1rem; }
+
+    /* Parciales compactos */
+    .parciales-wrap { margin-top: 8px; }
+    .parcial-input { width: 38px; font-size: 0.8rem; }
+
+    /* Tabla posiciones con scroll */
+    .tabla-pos { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tabla-pos table { min-width: 560px; }
+    .tabla-pos th, .tabla-pos td { padding: 6px 8px; font-size: 0.72rem; }
+
+    /* Equipos grid */
+    .equipos-grid { grid-template-columns: 1fr; gap: 16px; }
+    .equipos-tabla table { min-width: 320px; }
+    .equipos-tabla th, .equipos-tabla td { padding: 6px 10px; font-size: 0.78rem; }
+
+    /* Rename panel */
+    .rename-panel { padding: 14px; }
+    .rename-form { flex-direction: column; }
+    .rename-field { min-width: 100%; }
+    .btn-rename { width: 100%; text-align: center; }
+
+    /* Modal más ancho */
+    .modal { padding: 18px; width: 95%; }
+
+    /* Toast en la parte de abajo centrado */
+    #toast { right: 50%; transform: translateX(50%) translateY(100px); }
+    #toast.show { transform: translateX(50%) translateY(0); }
+
+    /* Acciones de fecha en mobile */
+    .fecha-actions { flex-wrap: wrap; gap: 5px; }
+    .btn-fecha { padding: 5px 10px; font-size: 0.72rem; }
+  }
+
+  /* Tablet intermedia */
+  @media(min-width: 701px) and (max-width: 900px) {
+    main { padding: 16px 16px; }
+    header { padding: 16px 20px 12px; }
+    .fecha-body { grid-template-columns: 1fr; }
+    .tabla-pos { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tabla-pos table { min-width: 560px; }
   }
 
   /* Ocultar spinners de inputs numéricos */
