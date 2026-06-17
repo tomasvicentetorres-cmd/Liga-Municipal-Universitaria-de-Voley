@@ -280,6 +280,8 @@
     min-width: 0;
   }
   .equipo-edit:focus { outline: none; border-bottom-color: var(--azul-claro); }
+  .equipo-local { text-align: center !important; }
+  .equipo-visit { text-align: center !important; }
   /* Span en modo lectura */
   .equipo-txt {
     display: block;
@@ -2146,7 +2148,7 @@ function cerrarModalPwd() {
 // GUARDAR / EXPORTAR / IMPORTAR
 // =============================================
 function guardar() {
-  const VERSION = '20250619b';
+  const VERSION = '20250619d';
   localStorage.setItem('liga2026_fixture', JSON.stringify(fixture));
   localStorage.setItem('liga2026_version', VERSION);
   showToast('¡Guardado exitosamente!', 'success');
@@ -2611,7 +2613,7 @@ function actualizarPlayoffs() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  const VERSION = '20250619b'; // Cambiá este número cada vez que subas datos nuevos
+  const VERSION = '20250619d'; // Cambiá este número cada vez que subas datos nuevos
   const savedVersion = localStorage.getItem('liga2026_version');
   const saved = localStorage.getItem('liga2026_fixture');
   if (saved && savedVersion === VERSION) {
