@@ -257,27 +257,25 @@
   }
   .part-hora-edit {
     font-size: 0.75rem;
-    font-weight: 700 !important;
-    color: #000 !important;
+    font-weight: 700;
+    color: #000;
     border: none;
     background: transparent;
     border-bottom: 1px dashed var(--gris-borde);
     width: 60px;
     padding: 0 2px;
-    -webkit-text-fill-color: #000;
   }
   .part-hora-edit:focus { outline: none; border-bottom-color: var(--azul-claro); }
   .part-sede-edit {
     font-size: 0.72rem;
-    font-weight: 700 !important;
-    color: #000 !important;
+    font-weight: 700;
+    color: #000;
     border: none;
     background: transparent;
     border-bottom: 1px dashed var(--gris-borde);
     flex: 1;
     min-width: 80px;
     padding: 0 2px;
-    -webkit-text-fill-color: #000;
   }
   .part-sede-edit:focus { outline: none; border-bottom-color: var(--azul-claro); }
 
@@ -1659,13 +1657,20 @@ function renderPartido(p, fecha) {
   const horaLbl = document.createElement('span');
   horaLbl.textContent = 'Hora:';
   horaLbl.style.cssText = 'font-size:0.65rem;font-weight:600;color:var(--gris-texto);white-space:nowrap;';
-  const horaInput = document.createElement('input');
-  horaInput.className = 'part-hora-edit';
-  horaInput.value = p.hora;
-  horaInput.disabled = !modoEdicion;
-  horaInput.onchange = (e) => { p.hora = e.target.value; };
-  horaWrap.appendChild(horaLbl);
-  horaWrap.appendChild(horaInput);
+  if (modoEdicion) {
+    const horaInput = document.createElement('input');
+    horaInput.className = 'part-hora-edit';
+    horaInput.value = p.hora;
+    horaInput.onchange = (e) => { p.hora = e.target.value; };
+    horaWrap.appendChild(horaLbl);
+    horaWrap.appendChild(horaInput);
+  } else {
+    const horaSpan = document.createElement('span');
+    horaSpan.className = 'part-hora-edit';
+    horaSpan.textContent = p.hora;
+    horaWrap.appendChild(horaLbl);
+    horaWrap.appendChild(horaSpan);
+  }
   top.appendChild(horaWrap);
 
   const sedeWrap = document.createElement('span');
@@ -1673,14 +1678,21 @@ function renderPartido(p, fecha) {
   const sedeLbl = document.createElement('span');
   sedeLbl.textContent = 'Sede:';
   sedeLbl.style.cssText = 'font-size:0.65rem;font-weight:600;color:var(--gris-texto);white-space:nowrap;flex-shrink:0;';
-  const sedeInput = document.createElement('input');
-  sedeInput.className = 'part-sede-edit';
-  sedeInput.value = p.sede;
-  sedeInput.placeholder = '—';
-  sedeInput.disabled = !modoEdicion;
-  sedeInput.onchange = (e) => { p.sede = e.target.value; };
-  sedeWrap.appendChild(sedeLbl);
-  sedeWrap.appendChild(sedeInput);
+  if (modoEdicion) {
+    const sedeInput = document.createElement('input');
+    sedeInput.className = 'part-sede-edit';
+    sedeInput.value = p.sede;
+    sedeInput.placeholder = '—';
+    sedeInput.onchange = (e) => { p.sede = e.target.value; };
+    sedeWrap.appendChild(sedeLbl);
+    sedeWrap.appendChild(sedeInput);
+  } else {
+    const sedeSpan = document.createElement('span');
+    sedeSpan.className = 'part-sede-edit';
+    sedeSpan.textContent = p.sede || '—';
+    sedeWrap.appendChild(sedeLbl);
+    sedeWrap.appendChild(sedeSpan);
+  }
   top.appendChild(sedeWrap);
 
   if (modoEdicion) {
