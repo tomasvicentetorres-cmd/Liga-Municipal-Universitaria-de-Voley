@@ -616,50 +616,56 @@
     .part-sede-edit { font-size: 0.64rem; }
     .partido-medio { padding: 4px 7px 5px; }
 
-    /* Equipos en fila — nombres largos con ellipsis (funciona en Safari iOS) */
-    .partido-equipos { flex-direction: row; align-items: center; gap: 4px; }
+    /* Equipos: columna centrada LOCAL / resultado / VISITANTE */
+    .partido-equipos {
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
     .equipo-edit {
-      flex: 1;
-      width: 0;
+      flex: unset;
+      width: 100%;
       min-width: 0;
       text-align: center !important;
-      font-size: 0.7rem;
+      font-size: 0.78rem;
       font-weight: 700;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      border-bottom: 1px solid var(--gris-borde);
+      border-bottom: none;
     }
     .equipo-txt {
-      width: 0;
+      width: 100%;
       min-width: 0;
-      flex: 1;
-      font-size: 0.7rem;
+      flex: unset;
+      font-size: 0.78rem;
+      text-align: center;
     }
-    .vs-label { font-size: 0.6rem; flex-shrink: 0; }
+    .vs-label { font-size: 0.58rem; }
 
-    /* Resultado */
-    .resultado-row { margin-top: 4px; gap: 5px; flex-wrap: nowrap; }
-    .resultado-input { width: 32px; font-size: 0.82rem; padding: 2px; }
-    .set-sep { font-size: 0.82rem; }
-
-    /* Parciales — scroll horizontal visible con indicador */
-    .parciales-wrap { margin-top: 4px; padding-top: 3px; }
-    .parciales-label { font-size: 0.58rem; margin-bottom: 2px; }
-    .parciales-lista {
+    /* Resultado centrado */
+    .resultado-row {
+      justify-content: center;
+      margin-top: 3px;
+      gap: 6px;
       flex-wrap: nowrap;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      gap: 3px;
-      padding-bottom: 4px;
-      /* scrollbar visible en mobile */
-      scrollbar-width: thin;
-      scrollbar-color: var(--gris-borde) transparent;
     }
-    .parciales-lista::-webkit-scrollbar { height: 3px; }
-    .parciales-lista::-webkit-scrollbar-track { background: transparent; }
-    .parciales-lista::-webkit-scrollbar-thumb { background: var(--gris-borde); border-radius: 2px; }
-    .parcial-item { padding: 1px 4px; flex-shrink: 0; }
+    .resultado-row > span:first-child { display: none; } /* ocultar label "Sets:" */
+    .resultado-row .ganador-label { display: none; } /* ocultar "✓ EQUIPO" en mobile */
+    .resultado-input { width: 34px; font-size: 0.9rem; padding: 2px; }
+    .set-sep { font-size: 0.9rem; }
+
+    /* Parciales: grilla que se adapta, sin scroll */
+    .parciales-wrap { margin-top: 5px; padding-top: 4px; }
+    .parciales-label { font-size: 0.58rem; margin-bottom: 3px; }
+    .parciales-lista {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      gap: 4px;
+      padding-bottom: 2px;
+      justify-content: center;
+    }
+    .parcial-item { padding: 2px 5px; flex-shrink: 0; }
     .parcial-input { width: 26px; font-size: 0.65rem; }
     .parcial-sep { font-size: 0.6rem; }
     .sin-resultado { font-size: 0.62rem; }
@@ -1721,7 +1727,6 @@ function renderPartido(p, fecha) {
     visSpan.className = 'equipo-edit equipo-txt';
     visSpan.textContent = p.visitante;
     visSpan.title = p.visitante;
-    visSpan.style.textAlign = 'right';
     equiposDiv.appendChild(visSpan);
   }
 
@@ -1766,6 +1771,7 @@ function renderPartido(p, fecha) {
 
   // Etiqueta ganador dinámica
   const ganadorSpan = document.createElement('span');
+  ganadorSpan.className = 'ganador-label';
   ganadorSpan.style.cssText = 'font-size:0.72rem;font-weight:700;margin-left:6px;';
 
   function actualizarVisual() {
@@ -2147,7 +2153,7 @@ function cerrarModalPwd() {
 // GUARDAR / EXPORTAR / IMPORTAR
 // =============================================
 function guardar() {
-  const VERSION = '20250617';
+  const VERSION = '20250618';
   localStorage.setItem('liga2026_fixture', JSON.stringify(fixture));
   localStorage.setItem('liga2026_version', VERSION);
   showToast('¡Guardado exitosamente!', 'success');
@@ -2612,7 +2618,7 @@ function actualizarPlayoffs() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  const VERSION = '20250617'; // Cambiá este número cada vez que subas datos nuevos
+  const VERSION = '20250618'; // Cambiá este número cada vez que subas datos nuevos
   const savedVersion = localStorage.getItem('liga2026_version');
   const saved = localStorage.getItem('liga2026_fixture');
   if (saved && savedVersion === VERSION) {
