@@ -2629,7 +2629,9 @@ document.addEventListener('DOMContentLoaded', function() {
       if (doc.exists && doc.data().data) {
         try {
           fixture = JSON.parse(doc.data().data);
+          // Backup automático en localStorage
           localStorage.setItem('liga2026_fixture', doc.data().data);
+          localStorage.setItem('liga2026_backup_ts', new Date().toLocaleString('es-AR'));
         } catch(e) {}
       }
       renderFixture();
@@ -2639,6 +2641,8 @@ document.addEventListener('DOMContentLoaded', function() {
       // Sin conexión: usar caché local
       const saved = localStorage.getItem('liga2026_fixture');
       if (saved) { try { fixture = JSON.parse(saved); } catch(e) {} }
+      const ts = localStorage.getItem('liga2026_backup_ts');
+      if (ts) showToast('Sin conexión — mostrando backup del ' + ts, '');
       renderFixture();
       scrollAProximaFecha();
     });
@@ -2705,6 +2709,8 @@ function scrollAProximaFecha() {
     <button class="btn" onclick="toggleModoEdicion()">✏️ Modo Edición</button>
     <span class="lock-badge" id="lockBadge">🔒 Solo lectura</span>
     <button class="btn btn-guardar" onclick="guardar()">💾 Guardar</button>
+    <button class="btn" onclick="exportarJSON()" title="Descargar copia de seguridad">📥 Exportar</button>
+    <label class="btn" style="cursor:pointer" title="Restaurar desde copia de seguridad">📤 Importar<input type="file" accept=".json" onchange="importarJSON(event)" style="display:none"></label>
   </div>
   <div class="filtros">
     <label>Buscar equipo:</label>
