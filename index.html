@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Liga Municipal Universitaria 2026</title>
 <style>
   :root {
@@ -280,14 +280,18 @@
     min-width: 0;
   }
   .equipo-edit:focus { outline: none; border-bottom-color: var(--azul-claro); }
-  /* Span en modo lectura: texto completo visible con ellipsis */
+  /* Span en modo lectura */
   .equipo-txt {
     display: block;
+    width: 0;          /* truco Safari: fuerza al flex a calcular bien */
+    min-width: 0;
+    flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     border-bottom: none;
     cursor: default;
+    padding: 2px 3px;
   }
   .vs-label {
     font-size: 0.7rem;
@@ -612,18 +616,25 @@
     .part-sede-edit { font-size: 0.64rem; }
     .partido-medio { padding: 4px 7px 5px; }
 
-    /* Equipos en fila — nombres largos con ellipsis */
+    /* Equipos en fila — nombres largos con ellipsis (funciona en Safari iOS) */
     .partido-equipos { flex-direction: row; align-items: center; gap: 4px; }
     .equipo-edit {
       flex: 1;
+      width: 0;
+      min-width: 0;
       text-align: center !important;
       font-size: 0.7rem;
       font-weight: 700;
-      min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       border-bottom: 1px solid var(--gris-borde);
+    }
+    .equipo-txt {
+      width: 0;
+      min-width: 0;
+      flex: 1;
+      font-size: 0.7rem;
     }
     .vs-label { font-size: 0.6rem; flex-shrink: 0; }
 
@@ -2045,8 +2056,8 @@ function filtrarEquipo(texto) {
       let hayAlgoEnCol = false;
 
       col.querySelectorAll('.partido-card').forEach(card => {
-        const inputs = card.querySelectorAll('.equipo-edit');
-        const match = Array.from(inputs).some(inp => inp.value.toLowerCase().includes(query));
+        const elems = card.querySelectorAll('.equipo-edit');
+        const match = Array.from(elems).some(el => (el.value || el.textContent || '').toLowerCase().includes(query));
         card.style.display = match ? '' : 'none';
         if (match) hayAlgoEnCol = true;
       });
