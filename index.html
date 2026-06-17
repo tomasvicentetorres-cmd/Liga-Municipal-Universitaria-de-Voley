@@ -6,6 +6,21 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD5ukRBUm8lhvM0WazrAGguJNqIb8iRx98",
+    authDomain: "liga-universitaria-de-voley.firebaseapp.com",
+    projectId: "liga-universitaria-de-voley",
+    storageBucket: "liga-universitaria-de-voley.firebasestorage.app",
+    messagingSenderId: "517188932597",
+    appId: "1:517188932597:web:679e7e4a54823027be86bc"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
 <title>Liga Municipal Universitaria 2026</title>
 <style>
   :root {
@@ -2121,10 +2136,18 @@ function cerrarModalPwd() {
 // GUARDAR / EXPORTAR / IMPORTAR
 // =============================================
 function guardar() {
-  const VERSION = '20250620d';
-  localStorage.setItem('liga2026_fixture', JSON.stringify(fixture));
-  localStorage.setItem('liga2026_version', VERSION);
-  showToast('¡Guardado exitosamente!', 'success');
+  const datos = JSON.stringify(fixture);
+  // Guardar en Firestore (todos los dispositivos se sincronizan)
+  db.collection('liga2026').doc('fixture').set({ data: datos, ts: Date.now() })
+    .then(() => {
+      localStorage.setItem('liga2026_fixture', datos);
+      showToast('¡Guardado y sincronizado!', 'success');
+    })
+    .catch(() => {
+      // Sin internet: guardar solo local
+      localStorage.setItem('liga2026_fixture', datos);
+      showToast('Guardado localmente (sin conexión)', 'warning');
+    });
 }
 
 function exportarJSON() {
@@ -2586,18 +2609,25 @@ function actualizarPlayoffs() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  const VERSION = '20250620d';
-  const savedVersion = localStorage.getItem('liga2026_version');
-  if (savedVersion !== VERSION) {
-    // Versión nueva: limpiar TODO el localStorage y arrancar desde el HTML
-    localStorage.clear();
-    localStorage.setItem('liga2026_version', VERSION);
-  } else {
-    const saved = localStorage.getItem('liga2026_fixture');
-    if (saved) { try { fixture = JSON.parse(saved); } catch(e) {} }
-  }
-  renderFixture();
-  scrollAProximaFecha();
+  // Cargar desde Firestore (fuente de verdad para todos los dispositivos)
+  db.collection('liga2026').doc('fixture').get()
+    .then(doc => {
+      if (doc.exists && doc.data().data) {
+        try {
+          fixture = JSON.parse(doc.data().data);
+          localStorage.setItem('liga2026_fixture', doc.data().data);
+        } catch(e) {}
+      }
+      renderFixture();
+      scrollAProximaFecha();
+    })
+    .catch(() => {
+      // Sin conexión: usar caché local
+      const saved = localStorage.getItem('liga2026_fixture');
+      if (saved) { try { fixture = JSON.parse(saved); } catch(e) {} }
+      renderFixture();
+      scrollAProximaFecha();
+    });
 });
 
 function parseFecha(str) {
@@ -2712,25 +2742,6 @@ function scrollAProximaFecha() {
 </div>
 
 <div id="toast"></div>
-
-<script>
-// Auto-actualización: compara el HTML del servidor con el actual
-// Si hay versión nueva, recarga la página forzando descarga fresca
-(function() {
-  const CURRENT = '20250620d';
-  setTimeout(function() {
-    fetch(location.href + '?_=' + Date.now(), { cache: 'no-store' })
-      .then(r => r.text())
-      .then(html => {
-        const m = html.match(/const CURRENT = '([^']+)'/);
-        if (m && m[1] !== CURRENT) {
-          location.reload(true);
-        }
-      })
-      .catch(() => {});
-  }, 2000);
-})();
-</script>
 
 </body>
 </html>
