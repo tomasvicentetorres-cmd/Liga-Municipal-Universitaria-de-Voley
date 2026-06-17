@@ -250,6 +250,7 @@
   .part-hora-edit:focus { outline: none; border-bottom-color: var(--azul-claro); }
   .part-sede-edit {
     font-size: 0.72rem;
+    font-weight: 700;
     color: var(--gris-texto);
     border: none;
     background: transparent;
@@ -280,8 +281,8 @@
     min-width: 0;
   }
   .equipo-edit:focus { outline: none; border-bottom-color: var(--azul-claro); }
-  .equipo-local { text-align: center !important; }
-  .equipo-visit { text-align: center !important; }
+  .equipo-local { text-align: right !important; }
+  .equipo-visit { text-align: left !important; }
   /* Span en modo lectura */
   .equipo-txt {
     display: block;
@@ -306,10 +307,12 @@
   .resultado-row {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     margin-top: 6px;
-    flex-wrap: wrap;
   }
+  .resultado-col { display: flex; flex-direction: column; align-items: center; min-width: 36px; }
+  .ganador-label { font-size: 0.65rem; font-weight: 700; margin-top: 2px; white-space: nowrap; }
   .resultado-sets {
     display: flex;
     align-items: center;
@@ -328,13 +331,16 @@
     width: 36px;
     font-size: 0.88rem;
     font-weight: 800;
-    text-align: center;
+    text-align: center !important;
     border: 1px solid var(--gris-borde);
     border-radius: 4px;
-    padding: 2px;
+    padding: 2px 0;
     color: var(--azul);
     background: #f8fafd;
+    box-sizing: border-box;
   }
+  .resultado-input::-webkit-inner-spin-button,
+  .resultado-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   .resultado-input:focus { outline: none; border-color: var(--azul-claro); }
   .resultado-input.ganador { background: #dbeafe; border-color: var(--celeste); }
 
@@ -353,6 +359,7 @@
     margin-bottom: 4px;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
   }
   .btn-add-set {
@@ -371,6 +378,7 @@
     flex-wrap: wrap;
     gap: 5px;
     align-items: center;
+    justify-content: center;
   }
   .parcial-item {
     display: flex;
@@ -640,14 +648,7 @@
     .vs-label { font-size: 0.6rem; flex-shrink: 0; }
 
     /* Resultado centrado */
-    .resultado-row {
-      justify-content: center;
-      margin-top: 3px;
-      gap: 6px;
-      flex-wrap: nowrap;
-    }
-    .resultado-row > span:first-child { display: none; } /* ocultar label "Sets:" */
-    .resultado-row .ganador-label { display: none; } /* ocultar "✓ EQUIPO" en mobile */
+    .resultado-row { margin-top: 3px; gap: 5px; }
     .resultado-input { width: 34px; font-size: 0.9rem; padding: 2px; }
     .set-sep { font-size: 0.9rem; }
 
@@ -1711,6 +1712,8 @@ function renderPartido(p, fecha) {
     localSpan.className = 'equipo-edit equipo-txt equipo-local';
     localSpan.textContent = p.local;
     localSpan.title = p.local;
+    if (p.res_l !== null && p.res_v !== null && p.res_l > p.res_v)
+      localSpan.style.color = 'var(--verde)';
     equiposDiv.appendChild(localSpan);
 
     const vs = document.createElement('span');
@@ -1722,32 +1725,23 @@ function renderPartido(p, fecha) {
     visSpan.className = 'equipo-edit equipo-txt equipo-visit';
     visSpan.textContent = p.visitante;
     visSpan.title = p.visitante;
+    if (p.res_l !== null && p.res_v !== null && p.res_v > p.res_l)
+      visSpan.style.color = 'var(--verde)';
     equiposDiv.appendChild(visSpan);
   }
 
   medio.appendChild(equiposDiv);
 
-  // RESULTADO
+  // RESULTADO — fila simple centrada: resL - resV
   const resRow = document.createElement('div');
   resRow.className = 'resultado-row';
 
-  const resLabel = document.createElement('span');
-  resLabel.style.cssText = 'font-size:0.68rem;color:var(--gris-texto);font-weight:700;';
-  resLabel.textContent = 'Sets:';
-  resRow.appendChild(resLabel);
-
-  const resSets = document.createElement('div');
-  resSets.className = 'resultado-sets';
-
-  // Input sets local
   const resL = document.createElement('input');
-  resL.className = 'resultado-input';
-  resL.type = 'number';
-  resL.min = '0'; resL.max = '3';
+  resL.className = 'resultado-input equipo-local';
+  resL.type = 'text'; resL.inputMode = 'numeric'; resL.pattern = '[0-3]';
   if (p.res_l !== null && p.res_l > p.res_v) resL.classList.add('ganador');
   resL.value = p.res_l !== null ? p.res_l : '';
   resL.placeholder = '-';
-  resL.title = 'Sets ' + p.local;
   resL.disabled = !modoEdicion;
 
   const sep = document.createElement('span');
@@ -1755,37 +1749,23 @@ function renderPartido(p, fecha) {
   sep.textContent = '-';
 
   const resV = document.createElement('input');
-  resV.className = 'resultado-input';
-  resV.type = 'number';
-  resV.min = '0'; resV.max = '3';
+  resV.className = 'resultado-input equipo-visit';
+  resV.type = 'text'; resV.inputMode = 'numeric'; resV.pattern = '[0-3]';
   if (p.res_v !== null && p.res_v > p.res_l) resV.classList.add('ganador');
   resV.value = p.res_v !== null ? p.res_v : '';
   resV.placeholder = '-';
-  resV.title = 'Sets ' + p.visitante;
   resV.disabled = !modoEdicion;
-
-  // Etiqueta ganador dinámica
-  const ganadorSpan = document.createElement('span');
-  ganadorSpan.className = 'ganador-label';
-  ganadorSpan.style.cssText = 'font-size:0.72rem;font-weight:700;margin-left:6px;';
 
   function actualizarVisual() {
     const vl = resL.value !== '' ? parseInt(resL.value) : null;
     const vv = resV.value !== '' ? parseInt(resV.value) : null;
     p.res_l = vl; p.res_v = vv;
     actualizarGanadorClase(resL, resV, p);
-    if (vl !== null && vv !== null) {
-      const gana = vl > vv ? p.local : (vv > vl ? p.visitante : null);
-      if (gana) {
-        ganadorSpan.style.color = 'var(--verde)';
-        ganadorSpan.textContent = '✓ ' + gana;
-      } else {
-        ganadorSpan.style.color = 'var(--gris-texto)';
-        ganadorSpan.textContent = 'Empate?';
-      }
-    } else {
-      ganadorSpan.style.color = 'var(--gris-texto)';
-      ganadorSpan.textContent = 'Pendiente';
+    // Repintar nombres
+    const spans = equiposDiv.querySelectorAll('.equipo-txt');
+    if (spans.length === 2) {
+      spans[0].style.color = (vl !== null && vv !== null && vl > vv) ? 'var(--verde)' : '';
+      spans[1].style.color = (vl !== null && vv !== null && vv > vl) ? 'var(--verde)' : '';
     }
   }
 
@@ -1794,22 +1774,9 @@ function renderPartido(p, fecha) {
   resV.addEventListener('input', actualizarVisual);
   resV.addEventListener('change', actualizarVisual);
 
-  resSets.appendChild(resL);
-  resSets.appendChild(sep);
-  resSets.appendChild(resV);
-  resRow.appendChild(resSets);
-
-  // Inicializar etiqueta
-  if (p.res_l !== null && p.res_v !== null) {
-    const gana = p.res_l > p.res_v ? p.local : (p.res_v > p.res_l ? p.visitante : null);
-    ganadorSpan.style.color = gana ? 'var(--verde)' : 'var(--gris-texto)';
-    ganadorSpan.textContent = gana ? '✓ ' + gana : 'Empate?';
-  } else {
-    ganadorSpan.style.color = 'var(--gris-texto)';
-    ganadorSpan.textContent = 'Pendiente';
-  }
-  resRow.appendChild(ganadorSpan);
-
+  resRow.appendChild(resL);
+  resRow.appendChild(sep);
+  resRow.appendChild(resV);
   medio.appendChild(resRow);
 
   // PARCIALES
@@ -2148,7 +2115,7 @@ function cerrarModalPwd() {
 // GUARDAR / EXPORTAR / IMPORTAR
 // =============================================
 function guardar() {
-  const VERSION = '20250619d';
+  const VERSION = '20250619l';
   localStorage.setItem('liga2026_fixture', JSON.stringify(fixture));
   localStorage.setItem('liga2026_version', VERSION);
   showToast('¡Guardado exitosamente!', 'success');
@@ -2613,7 +2580,7 @@ function actualizarPlayoffs() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  const VERSION = '20250619d'; // Cambiá este número cada vez que subas datos nuevos
+  const VERSION = '20250619l'; // Cambiá este número cada vez que subas datos nuevos
   const savedVersion = localStorage.getItem('liga2026_version');
   const saved = localStorage.getItem('liga2026_fixture');
   if (saved && savedVersion === VERSION) {
