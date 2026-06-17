@@ -2714,34 +2714,22 @@ function scrollAProximaFecha() {
 <div id="toast"></div>
 
 <script>
-// Service Worker para invalidar caché automáticamente en cada deploy
-if ('serviceWorker' in navigator) {
-  // Crear el SW como blob inline — no necesita archivo separado
-  const swCode = `
-    const CACHE = 'liga-v-${Date.now()}';
-    self.addEventListener('install', e => {
-      self.skipWaiting();
-    });
-    self.addEventListener('activate', e => {
-      e.waitUntil(
-        caches.keys().then(keys =>
-          Promise.all(keys.map(k => caches.delete(k)))
-        ).then(() => self.clients.claim())
-      );
-    });
-    self.addEventListener('fetch', e => {
-      // Siempre ir a la red, nunca al caché
-      e.respondWith(
-        fetch(e.request, { cache: 'no-store' })
-          .catch(() => caches.match(e.request))
-      );
-    });
-  `;
-  const blob = new Blob([swCode], { type: 'application/javascript' });
-  const swURL = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swURL, { scope: '/' })
-    .catch(() => {}); // silenciar errores si el scope falla
-}
+// Auto-actualización: compara el HTML del servidor con el actual
+// Si hay versión nueva, recarga la página forzando descarga fresca
+(function() {
+  const CURRENT = '20250620d';
+  setTimeout(function() {
+    fetch(location.href + '?_=' + Date.now(), { cache: 'no-store' })
+      .then(r => r.text())
+      .then(html => {
+        const m = html.match(/const CURRENT = '([^']+)'/);
+        if (m && m[1] !== CURRENT) {
+          location.reload(true);
+        }
+      })
+      .catch(() => {});
+  }, 2000);
+})();
 </script>
 
 </body>
