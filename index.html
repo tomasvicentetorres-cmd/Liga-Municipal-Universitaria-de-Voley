@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -257,25 +257,27 @@
   }
   .part-hora-edit {
     font-size: 0.75rem;
-    font-weight: 700;
-    color: #000;
+    font-weight: 700 !important;
+    color: #000 !important;
     border: none;
     background: transparent;
     border-bottom: 1px dashed var(--gris-borde);
     width: 60px;
     padding: 0 2px;
+    -webkit-text-fill-color: #000;
   }
   .part-hora-edit:focus { outline: none; border-bottom-color: var(--azul-claro); }
   .part-sede-edit {
     font-size: 0.72rem;
-    font-weight: 700;
-    color: #000;
+    font-weight: 700 !important;
+    color: #000 !important;
     border: none;
     background: transparent;
     border-bottom: 1px dashed var(--gris-borde);
     flex: 1;
     min-width: 80px;
     padding: 0 2px;
+    -webkit-text-fill-color: #000;
   }
   .part-sede-edit:focus { outline: none; border-bottom-color: var(--azul-claro); }
 
