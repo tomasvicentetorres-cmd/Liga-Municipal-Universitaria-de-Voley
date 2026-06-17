@@ -1777,6 +1777,9 @@ function renderPartido(p, fecha) {
   resRow.appendChild(resL);
   resRow.appendChild(sep);
   resRow.appendChild(resV);
+  // Forzar centrado inline por si algún CSS lo pisa
+  resL.style.cssText += ';text-align:center !important;';
+  resV.style.cssText += ';text-align:center !important;';
   medio.appendChild(resRow);
 
   // PARCIALES
@@ -2115,7 +2118,7 @@ function cerrarModalPwd() {
 // GUARDAR / EXPORTAR / IMPORTAR
 // =============================================
 function guardar() {
-  const VERSION = '20250620a';
+  const VERSION = '20250620b';
   localStorage.setItem('liga2026_fixture', JSON.stringify(fixture));
   localStorage.setItem('liga2026_version', VERSION);
   showToast('¡Guardado exitosamente!', 'success');
@@ -2580,15 +2583,15 @@ function actualizarPlayoffs() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  const VERSION = '20250620a'; // Cambiá este número cada vez que subas datos nuevos
+  const VERSION = '20250620b';
   const savedVersion = localStorage.getItem('liga2026_version');
-  const saved = localStorage.getItem('liga2026_fixture');
-  if (saved && savedVersion === VERSION) {
-    try { fixture = JSON.parse(saved); } catch(e) {}
-  } else {
-    // Versión vieja o primera vez: borrar datos viejos y usar los del HTML
-    localStorage.removeItem('liga2026_fixture');
+  if (savedVersion !== VERSION) {
+    // Versión nueva: limpiar TODO el localStorage y arrancar desde el HTML
+    localStorage.clear();
     localStorage.setItem('liga2026_version', VERSION);
+  } else {
+    const saved = localStorage.getItem('liga2026_fixture');
+    if (saved) { try { fixture = JSON.parse(saved); } catch(e) {} }
   }
   renderFixture();
   scrollAProximaFecha();
