@@ -2147,7 +2147,9 @@ function cerrarModalPwd() {
 // GUARDAR / EXPORTAR / IMPORTAR
 // =============================================
 function guardar() {
+  const VERSION = '20250617';
   localStorage.setItem('liga2026_fixture', JSON.stringify(fixture));
+  localStorage.setItem('liga2026_version', VERSION);
   showToast('¡Guardado exitosamente!', 'success');
 }
 
@@ -2610,8 +2612,16 @@ function actualizarPlayoffs() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
+  const VERSION = '20250617'; // Cambiá este número cada vez que subas datos nuevos
+  const savedVersion = localStorage.getItem('liga2026_version');
   const saved = localStorage.getItem('liga2026_fixture');
-  if (saved) { try { fixture = JSON.parse(saved); } catch(e){} }
+  if (saved && savedVersion === VERSION) {
+    try { fixture = JSON.parse(saved); } catch(e) {}
+  } else {
+    // Versión vieja o primera vez: borrar datos viejos y usar los del HTML
+    localStorage.removeItem('liga2026_fixture');
+    localStorage.setItem('liga2026_version', VERSION);
+  }
   renderFixture();
   scrollAProximaFecha();
 });
