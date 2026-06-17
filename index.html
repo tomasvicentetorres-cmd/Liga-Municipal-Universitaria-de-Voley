@@ -616,32 +616,26 @@
     .part-sede-edit { font-size: 0.64rem; }
     .partido-medio { padding: 4px 7px 5px; }
 
-    /* Equipos: columna centrada LOCAL / resultado / VISITANTE */
+    /* Equipos: fila — local a la derecha, vs centrado, visitante a la izquierda */
     .partido-equipos {
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
-      gap: 2px;
+      gap: 4px;
     }
-    .equipo-edit {
-      flex: unset;
-      width: 100%;
+    .equipo-edit, .equipo-txt {
+      flex: 1;
+      width: 0;
       min-width: 0;
-      text-align: center !important;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 700;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       border-bottom: none;
     }
-    .equipo-txt {
-      width: 100%;
-      min-width: 0;
-      flex: unset;
-      font-size: 0.78rem;
-      text-align: center;
-    }
-    .vs-label { font-size: 0.58rem; }
+    .equipo-local { text-align: right !important; }
+    .equipo-visit { text-align: left !important; }
+    .vs-label { font-size: 0.6rem; flex-shrink: 0; }
 
     /* Resultado centrado */
     .resultado-row {
@@ -1695,7 +1689,7 @@ function renderPartido(p, fecha) {
 
   if (modoEdicion) {
     const localInput = document.createElement('input');
-    localInput.className = 'equipo-edit';
+    localInput.className = 'equipo-edit equipo-local';
     localInput.value = p.local;
     localInput.onchange = (e) => { p.local = e.target.value; };
     equiposDiv.appendChild(localInput);
@@ -1706,14 +1700,13 @@ function renderPartido(p, fecha) {
     equiposDiv.appendChild(vs);
 
     const visInput = document.createElement('input');
-    visInput.className = 'equipo-edit';
+    visInput.className = 'equipo-edit equipo-visit';
     visInput.value = p.visitante;
-    visInput.style.textAlign = 'right';
     visInput.onchange = (e) => { p.visitante = e.target.value; };
     equiposDiv.appendChild(visInput);
   } else {
     const localSpan = document.createElement('span');
-    localSpan.className = 'equipo-edit equipo-txt';
+    localSpan.className = 'equipo-edit equipo-txt equipo-local';
     localSpan.textContent = p.local;
     localSpan.title = p.local;
     equiposDiv.appendChild(localSpan);
@@ -1724,7 +1717,7 @@ function renderPartido(p, fecha) {
     equiposDiv.appendChild(vs);
 
     const visSpan = document.createElement('span');
-    visSpan.className = 'equipo-edit equipo-txt';
+    visSpan.className = 'equipo-edit equipo-txt equipo-visit';
     visSpan.textContent = p.visitante;
     visSpan.title = p.visitante;
     equiposDiv.appendChild(visSpan);
@@ -2153,7 +2146,7 @@ function cerrarModalPwd() {
 // GUARDAR / EXPORTAR / IMPORTAR
 // =============================================
 function guardar() {
-  const VERSION = '20250618';
+  const VERSION = '20250619b';
   localStorage.setItem('liga2026_fixture', JSON.stringify(fixture));
   localStorage.setItem('liga2026_version', VERSION);
   showToast('¡Guardado exitosamente!', 'success');
@@ -2618,7 +2611,7 @@ function actualizarPlayoffs() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  const VERSION = '20250618'; // Cambiá este número cada vez que subas datos nuevos
+  const VERSION = '20250619b'; // Cambiá este número cada vez que subas datos nuevos
   const savedVersion = localStorage.getItem('liga2026_version');
   const saved = localStorage.getItem('liga2026_fixture');
   if (saved && savedVersion === VERSION) {
