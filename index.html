@@ -240,7 +240,7 @@
   .part-hora-edit {
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--azul);
+    color: #000;
     border: none;
     background: transparent;
     border-bottom: 1px dashed var(--gris-borde);
@@ -251,7 +251,7 @@
   .part-sede-edit {
     font-size: 0.72rem;
     font-weight: 700;
-    color: var(--gris-texto);
+    color: #000;
     border: none;
     background: transparent;
     border-bottom: 1px dashed var(--gris-borde);
@@ -2115,7 +2115,7 @@ function cerrarModalPwd() {
 // GUARDAR / EXPORTAR / IMPORTAR
 // =============================================
 function guardar() {
-  const VERSION = '20250619l';
+  const VERSION = '20250620a';
   localStorage.setItem('liga2026_fixture', JSON.stringify(fixture));
   localStorage.setItem('liga2026_version', VERSION);
   showToast('¡Guardado exitosamente!', 'success');
@@ -2580,7 +2580,7 @@ function actualizarPlayoffs() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  const VERSION = '20250619l'; // Cambiá este número cada vez que subas datos nuevos
+  const VERSION = '20250620a'; // Cambiá este número cada vez que subas datos nuevos
   const savedVersion = localStorage.getItem('liga2026_version');
   const saved = localStorage.getItem('liga2026_fixture');
   if (saved && savedVersion === VERSION) {
