@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Liga Municipal Universitaria 2026</title>
 <style>
   :root {
@@ -2118,7 +2121,7 @@ function cerrarModalPwd() {
 // GUARDAR / EXPORTAR / IMPORTAR
 // =============================================
 function guardar() {
-  const VERSION = '20250620b';
+  const VERSION = '20250620d';
   localStorage.setItem('liga2026_fixture', JSON.stringify(fixture));
   localStorage.setItem('liga2026_version', VERSION);
   showToast('¡Guardado exitosamente!', 'success');
@@ -2583,7 +2586,7 @@ function actualizarPlayoffs() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  const VERSION = '20250620b';
+  const VERSION = '20250620d';
   const savedVersion = localStorage.getItem('liga2026_version');
   if (savedVersion !== VERSION) {
     // Versión nueva: limpiar TODO el localStorage y arrancar desde el HTML
@@ -2709,6 +2712,37 @@ function scrollAProximaFecha() {
 </div>
 
 <div id="toast"></div>
+
+<script>
+// Service Worker para invalidar caché automáticamente en cada deploy
+if ('serviceWorker' in navigator) {
+  // Crear el SW como blob inline — no necesita archivo separado
+  const swCode = `
+    const CACHE = 'liga-v-${Date.now()}';
+    self.addEventListener('install', e => {
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(
+        caches.keys().then(keys =>
+          Promise.all(keys.map(k => caches.delete(k)))
+        ).then(() => self.clients.claim())
+      );
+    });
+    self.addEventListener('fetch', e => {
+      // Siempre ir a la red, nunca al caché
+      e.respondWith(
+        fetch(e.request, { cache: 'no-store' })
+          .catch(() => caches.match(e.request))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swURL = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swURL, { scope: '/' })
+    .catch(() => {}); // silenciar errores si el scope falla
+}
+</script>
 
 </body>
 </html>
