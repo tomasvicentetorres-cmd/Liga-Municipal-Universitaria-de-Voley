@@ -2107,9 +2107,13 @@ function toggleModoEdicion() {
     document.querySelectorAll('.header-tools .btn').forEach(b => {
       if (b.textContent.includes('Edición')) b.classList.remove('active');
     });
+    document.getElementById('btnGuardar').style.display = 'none';
+    document.getElementById('btnExportar').style.display = 'none';
+    document.getElementById('btnImportar').style.display = 'none';
     const badge = document.getElementById('lockBadge');
     badge.textContent = '🔒 Solo lectura';
     badge.classList.remove('unlocked');
+    badge.style.display = 'none';
     renderFixture();
     showToast('Modo edición desactivado', 'info');
   } else {
@@ -2130,9 +2134,13 @@ async function verificarPwd() {
     document.querySelectorAll('.header-tools .btn').forEach(b => {
       if (b.textContent.includes('Edición')) b.classList.add('active');
     });
+    document.getElementById('btnGuardar').style.display = '';
+    document.getElementById('btnExportar').style.display = '';
+    document.getElementById('btnImportar').style.display = '';
     const badge = document.getElementById('lockBadge');
     badge.textContent = '🔓 Editando';
     badge.classList.add('unlocked');
+    badge.style.display = '';
     renderFixture();
     showToast('Modo edición activado', 'success');
   } else {
@@ -2707,10 +2715,10 @@ function scrollAProximaFecha() {
     <button class="btn" onclick="filtrarGenero('F')">⚢ Femenino</button>
     <button class="btn" onclick="filtrarGenero('M')">⚣ Masculino</button>
     <button class="btn" onclick="toggleModoEdicion()">✏️ Modo Edición</button>
-    <span class="lock-badge" id="lockBadge">🔒 Solo lectura</span>
-    <button class="btn btn-guardar" onclick="guardar()">💾 Guardar</button>
-    <button class="btn" onclick="exportarJSON()" title="Descargar copia de seguridad">📥 Exportar</button>
-    <label class="btn" style="cursor:pointer" title="Restaurar desde copia de seguridad">📤 Importar<input type="file" accept=".json" onchange="importarJSON(event)" style="display:none"></label>
+    <span class="lock-badge" id="lockBadge" style="display:none">🔓 Editando</span>
+    <button class="btn btn-guardar" id="btnGuardar" onclick="guardar()" style="display:none">💾 Guardar</button>
+    <button class="btn" id="btnExportar" onclick="exportarJSON()" style="display:none" title="Descargar copia de seguridad">📥 Exportar</button>
+    <label class="btn" id="btnImportar" style="display:none;cursor:pointer" title="Restaurar desde copia de seguridad">📤 Importar<input type="file" accept=".json" onchange="importarJSON(event)" style="display:none"></label>
   </div>
   <div class="filtros">
     <label>Buscar equipo:</label>
