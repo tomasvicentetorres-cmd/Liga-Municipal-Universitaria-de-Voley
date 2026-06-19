@@ -2103,6 +2103,7 @@ async function sha256(msg) {
 function toggleModoEdicion() {
   if (modoEdicion) {
     // Desactivar edición (no requiere contraseña)
+    const scrollY = window.scrollY;
     modoEdicion = false;
     document.querySelectorAll('.header-tools .btn').forEach(b => {
       if (b.textContent.includes('Edición')) b.classList.remove('active');
@@ -2115,6 +2116,7 @@ function toggleModoEdicion() {
     badge.classList.remove('unlocked');
     badge.style.display = 'none';
     renderFixture();
+    window.scrollTo({ top: scrollY, behavior: 'instant' });
     showToast('Modo edición desactivado', 'info');
   } else {
     // Pedir contraseña para activar
@@ -2130,6 +2132,7 @@ async function verificarPwd() {
   const hash = await sha256(ingresada);
   if (hash === HASH_CORRECTO) {
     cerrarModalPwd();
+    const scrollY = window.scrollY;
     modoEdicion = true;
     document.querySelectorAll('.header-tools .btn').forEach(b => {
       if (b.textContent.includes('Edición')) b.classList.add('active');
@@ -2142,6 +2145,7 @@ async function verificarPwd() {
     badge.classList.add('unlocked');
     badge.style.display = '';
     renderFixture();
+    window.scrollTo({ top: scrollY, behavior: 'instant' });
     showToast('Modo edición activado', 'success');
   } else {
     document.getElementById('pwdError').textContent = '❌ Contraseña incorrecta. Intentá de nuevo.';
@@ -2669,25 +2673,43 @@ function parseFecha(str) {
 function scrollAProximaFecha() {
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
-  const dow = hoy.getDay();
-  let diasAlJueves;
-  if (dow === 0)      { diasAlJueves = 4; }
-  else if (dow === 6) { diasAlJueves = 5; }
-  else                { diasAlJueves = 4 - dow; if (diasAlJueves < 0) diasAlJueves += 7; }
-
-  const juevesSemana = new Date(hoy);
-  juevesSemana.setDate(hoy.getDate() + diasAlJueves);
-  juevesSemana.setHours(0, 0, 0, 0);
 
   let fechaTarget = null;
   let menorDiff = Infinity;
+
+  // Primero buscar si hoy mismo tiene partidos
   fixture.forEach(f => {
     const d = parseFecha(f.fecha);
     if (!d) return;
     d.setHours(0, 0, 0, 0);
-    const diff = d - juevesSemana;
-    if (diff >= 0 && diff < menorDiff) { menorDiff = diff; fechaTarget = f.id; }
+    if (d.getTime() === hoy.getTime()) {
+      fechaTarget = f.id;
+      menorDiff = 0;
+    }
   });
+
+  // Si no hay partidos hoy, buscar la próxima fecha futura más cercana
+  if (!fechaTarget) {
+    fixture.forEach(f => {
+      const d = parseFecha(f.fecha);
+      if (!d) return;
+      d.setHours(0, 0, 0, 0);
+      const diff = d - hoy;
+      if (diff > 0 && diff < menorDiff) { menorDiff = diff; fechaTarget = f.id; }
+    });
+  }
+
+  // Si no hay fecha futura, buscar la más reciente pasada
+  if (!fechaTarget) {
+    let mayorPasado = -Infinity;
+    fixture.forEach(f => {
+      const d = parseFecha(f.fecha);
+      if (!d) return;
+      d.setHours(0, 0, 0, 0);
+      const diff = d - hoy;
+      if (diff < 0 && diff > mayorPasado) { mayorPasado = diff; fechaTarget = f.id; }
+    });
+  }
 
   if (fechaTarget) {
     setTimeout(() => {
