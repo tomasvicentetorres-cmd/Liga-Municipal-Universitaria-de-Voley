@@ -2100,6 +2100,8 @@ async function sha256(msg) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
+let _scrollAntesModo = 0;
+
 function toggleModoEdicion() {
   if (modoEdicion) {
     // Desactivar edición (no requiere contraseña)
@@ -2120,6 +2122,7 @@ function toggleModoEdicion() {
     showToast('Modo edición desactivado', 'info');
   } else {
     // Pedir contraseña para activar
+    _scrollAntesModo = window.scrollY;
     document.getElementById('pwdInput').value = '';
     document.getElementById('pwdError').textContent = '';
     document.getElementById('modalPwd').classList.add('open');
@@ -2132,7 +2135,7 @@ async function verificarPwd() {
   const hash = await sha256(ingresada);
   if (hash === HASH_CORRECTO) {
     cerrarModalPwd();
-    const scrollY = window.scrollY;
+    const scrollY = _scrollAntesModo;
     modoEdicion = true;
     document.querySelectorAll('.header-tools .btn').forEach(b => {
       if (b.textContent.includes('Edición')) b.classList.add('active');
