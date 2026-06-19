@@ -299,13 +299,13 @@
   }
   .partido-equipos {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
     gap: 4px;
     width: 100%;
   }
   .equipo-edit {
-    font-size: clamp(0.68rem, 2vw, 0.85rem);
+    font-size: clamp(0.72rem, 3.5vw, 0.85rem);
     font-weight: 700;
     color: var(--azul);
     border: none;
@@ -333,10 +333,11 @@
     border-bottom: none;
     cursor: default;
     padding: 2px 4px;
-    font-size: clamp(0.68rem, 2vw, 0.85rem);
+    font-size: clamp(0.72rem, 3.5vw, 0.85rem);
     font-weight: 700;
     color: var(--azul);
     width: 100%;
+    min-width: 0;
   }
   .equipo-txt.equipo-local {
     text-align: center !important;
