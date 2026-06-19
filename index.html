@@ -305,8 +305,8 @@
     width: 100%;
   }
   /* Estilos compartidos para input (edición) y span (lectura) */
-  .equipo-local,
-  .equipo-visit {
+  .nombre-local,
+  .nombre-visit {
     display: block;
     min-width: 0;
     width: 100%;
@@ -320,15 +320,15 @@
     text-align: center !important;
   }
   /* Solo para input en modo edición */
-  input.equipo-local,
-  input.equipo-visit {
+  input.nombre-local,
+  input.nombre-visit {
     border: none;
     background: transparent;
     border-bottom: 1px dashed var(--gris-borde);
     cursor: text;
   }
-  input.equipo-local:focus,
-  input.equipo-visit:focus { outline: none; border-bottom-color: var(--azul-claro); }
+  input.nombre-local:focus,
+  input.nombre-visit:focus { outline: none; border-bottom-color: var(--azul-claro); }
   .vs-label {
     font-size: clamp(0.6rem, 1.6vw, 0.72rem);
     font-weight: 800;
@@ -678,8 +678,8 @@
       white-space: nowrap;
       border-bottom: none;
     }
-    .equipo-local { text-align: right !important; }
-    .equipo-visit { text-align: left !important; }
+    .nombre-local { text-align: center !important; }
+    .nombre-visit { text-align: center !important; }
     .vs-label { font-size: 0.6rem; flex-shrink: 0; }
 
     /* Resultado centrado */
@@ -1741,7 +1741,7 @@ function renderPartido(p, fecha) {
 
   if (modoEdicion) {
     const localInput = document.createElement('input');
-    localInput.className = 'equipo-edit equipo-local';
+    localInput.className = 'nombre-local';
     localInput.value = p.local;
     localInput.onchange = (e) => { p.local = e.target.value; };
     equiposDiv.appendChild(localInput);
@@ -1752,13 +1752,13 @@ function renderPartido(p, fecha) {
     equiposDiv.appendChild(vs);
 
     const visInput = document.createElement('input');
-    visInput.className = 'equipo-edit equipo-visit';
+    visInput.className = 'nombre-visit';
     visInput.value = p.visitante;
     visInput.onchange = (e) => { p.visitante = e.target.value; };
     equiposDiv.appendChild(visInput);
   } else {
     const localSpan = document.createElement('span');
-    localSpan.className = 'equipo-edit equipo-txt equipo-local';
+    localSpan.className = 'nombre-local';
     localSpan.textContent = p.local;
     localSpan.title = p.local;
     if (p.res_l !== null && p.res_v !== null && p.res_l > p.res_v)
@@ -1771,7 +1771,7 @@ function renderPartido(p, fecha) {
     equiposDiv.appendChild(vs);
 
     const visSpan = document.createElement('span');
-    visSpan.className = 'equipo-edit equipo-txt equipo-visit';
+    visSpan.className = 'nombre-visit';
     visSpan.textContent = p.visitante;
     visSpan.title = p.visitante;
     if (p.res_l !== null && p.res_v !== null && p.res_v > p.res_l)
