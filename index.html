@@ -716,6 +716,7 @@
     .rename-form { flex-direction: column; }
     .rename-field { min-width: 100%; }
     .btn-rename { width: 100%; }
+    .btn-eliminar-equipo { width: 100%; }
 
     /* ── MODAL ── */
     .modal { padding: 14px; width: 96%; }
@@ -851,6 +852,19 @@
     align-self: flex-end;
   }
   .btn-rename:hover { background: var(--azul-claro); }
+  .btn-eliminar-equipo {
+    background: var(--rojo, #dc2626);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    align-self: flex-end;
+  }
+  .btn-eliminar-equipo:hover { background: #b91c1c; }
   .rename-resultado {
     margin-top: 10px;
     font-size: 0.78rem;
@@ -7477,6 +7491,70 @@ function renombrarEquipo() {
   renderFixture();
 }
 
+// =============================================
+// ELIMINAR EQUIPO DE TODO EL FIXTURE
+// =============================================
+function eliminarEquipo() {
+  const gen    = document.getElementById('rename-gen').value;
+  const equipo = document.getElementById('rename-viejo').value;
+  const resDiv = document.getElementById('rename-resultado');
+
+  if (!equipo) {
+    resDiv.className = 'rename-resultado err';
+    resDiv.textContent = '⚠ Seleccioná un equipo para eliminar.';
+    return;
+  }
+
+  // Contar cuántos partidos se van a borrar (y cuántos ya tienen resultado cargado)
+  let totalPartidos = 0;
+  let conResultado = 0;
+  fixture.forEach(fecha => {
+    fecha.partidos.forEach(p => {
+      if (p.gen !== gen) return;
+      if (p.local === equipo || p.visitante === equipo) {
+        totalPartidos++;
+        if (p.res_l !== null && p.res_v !== null) conResultado++;
+      }
+    });
+  });
+
+  if (totalPartidos === 0) {
+    resDiv.className = 'rename-resultado err';
+    resDiv.textContent = `⚠ "${equipo}" no tiene partidos en ${gen === 'F' ? 'Femenino' : 'Masculino'}.`;
+    return;
+  }
+
+  const msg = `¿Eliminar "${equipo}" de ${gen === 'F' ? 'Femenino' : 'Masculino'}?\n\n` +
+    `Se van a borrar ${totalPartidos} partido${totalPartidos !== 1 ? 's' : ''}` +
+    (conResultado > 0 ? `, de los cuales ${conResultado} ya tienen resultado cargado (se pierde ese dato).` : '.') +
+    `\n\nLa tabla de posiciones se recalcula automáticamente después.\n\nEsta acción no se puede deshacer.`;
+
+  if (!confirm(msg)) return;
+
+  let borrados = 0;
+  fixture.forEach(fecha => {
+    const antes = fecha.partidos.length;
+    fecha.partidos = fecha.partidos.filter(p => {
+      if (p.gen !== gen) return true;
+      return p.local !== equipo && p.visitante !== equipo;
+    });
+    borrados += antes - fecha.partidos.length;
+  });
+
+  // Limpiar entrada de pagos si existía
+  const keyEquipo = gen + '|' + equipo;
+  if (PAGOS[keyEquipo] !== undefined) delete PAGOS[keyEquipo];
+
+  resDiv.className = 'rename-resultado ok';
+  resDiv.textContent = `✓ "${equipo}" eliminado. Se borraron ${borrados} partido${borrados !== 1 ? 's' : ''}. La tabla de posiciones se actualizó automáticamente.`;
+
+  actualizarSelectRename(gen);
+
+  // Actualizar vistas
+  renderEquipos();
+  renderFixture();
+}
+
 function actualizarSelectRename(gen) {
   const sel = document.getElementById('rename-viejo');
   if (!sel) return;
@@ -7496,7 +7574,7 @@ function renderEquipos() {
   } else {
     renamePanel.innerHTML = `
     <h3>✏️ Renombrar equipo en todo el fixture</h3>
-    <p>Seleccioná el equipo a renombrar y escribí el nombre nuevo. El cambio se aplica en todos los partidos y en la tabla de posiciones automáticamente.</p>
+    <p>Seleccioná el equipo a renombrar o eliminar. Los cambios se aplican en todos los partidos y en la tabla de posiciones automáticamente.</p>
     <div class="rename-form">
       <div class="rename-field">
         <label>División</label>
@@ -7514,6 +7592,7 @@ function renderEquipos() {
         <input type="text" id="rename-nuevo" placeholder="Escribí el nombre nuevo...">
       </div>
       <button class="btn-rename" onclick="renombrarEquipo()">Renombrar</button>
+      <button class="btn-eliminar-equipo" onclick="eliminarEquipo()">🗑️ Eliminar equipo</button>
     </div>
     <div class="rename-resultado" id="rename-resultado"></div>
   `;
