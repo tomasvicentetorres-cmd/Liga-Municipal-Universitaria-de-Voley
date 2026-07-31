@@ -6500,11 +6500,11 @@ function renderFixture() {
     };
     tituloWrap.appendChild(titInput);
 
-    if (fecha.nota || fecha.esPlayoff) {
+    if (fecha.nota || fecha.esPlayoff || modoEdicion) {
       const notaInput = document.createElement('input');
       notaInput.className = 'fecha-nota-edit';
       notaInput.value = fecha.nota || '';
-      notaInput.placeholder = 'nota...';
+      notaInput.placeholder = 'nota... (ej: A REPROGRAMAR)';
       notaInput.disabled = !modoEdicion;
       notaInput.onchange = (e) => { fecha.nota = e.target.value; };
       tituloWrap.appendChild(notaInput);
