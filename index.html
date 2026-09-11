@@ -7199,7 +7199,11 @@ function showTab(tab) {
       (tab === 'equipos'    && t.textContent.includes('Equipos'))
     );
   });
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (tab === 'fixture') {
+    scrollAProximaFecha();
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   if (tab === 'posiciones') renderPosiciones();
   if (tab === 'equipos')    renderEquipos();
 }
