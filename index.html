@@ -790,6 +790,18 @@
   .pago-badge.no  { background:#fee2e2; color:#dc2626; }
 
 
+
+  /* Pestaña reglamento */
+  .reglamento { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+  .reg-bloque { background: white; border: 1px solid var(--gris-borde); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(26,39,68,0.08); }
+  .reg-bloque h2 { background: var(--azul); color: white; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.4px; padding: 11px 18px; border-left: 4px solid var(--dorado); }
+  .reg-bloque ol { list-style: none; counter-reset: reg; padding: 6px 18px 10px; }
+  .reg-bloque li { counter-increment: reg; position: relative; padding: 9px 0 9px 34px; font-size: 0.84rem; line-height: 1.5; color: var(--azul); border-bottom: 1px solid #f0f4fb; }
+  .reg-bloque li:last-child { border-bottom: none; }
+  .reg-bloque li::before { content: counter(reg); position: absolute; left: 0; top: 9px; width: 22px; height: 22px; border-radius: 50%; background: var(--dorado-suave); color: #92400e; font-size: 0.72rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .reg-bloque li b { font-weight: 700; }
+  @media(max-width:700px){ .reg-bloque h2{font-size:0.78rem;padding:9px 12px} .reg-bloque ol{padding:4px 12px 8px} .reg-bloque li{font-size:0.76rem;padding-left:30px} }
+
   /* Panel renombrar equipo */
   .rename-panel {
     background: white;
@@ -7189,14 +7201,15 @@ function importarJSON(e) {
 // TABS
 // =============================================
 function showTab(tab) {
-  ['fixture','posiciones','equipos'].forEach(id => {
+  ['fixture','posiciones','equipos','reglamento'].forEach(id => {
     document.getElementById('tab-' + id).style.display = tab === id ? 'block' : 'none';
   });
   document.querySelectorAll('.tab').forEach(t => {
     t.classList.toggle('active',
       (tab === 'fixture'    && t.textContent.includes('Fixture'))    ||
       (tab === 'posiciones' && t.textContent.includes('Posiciones')) ||
-      (tab === 'equipos'    && t.textContent.includes('Equipos'))
+      (tab === 'equipos'    && t.textContent.includes('Equipos'))    ||
+      (tab === 'reglamento' && t.textContent.includes('Reglamento'))
     );
   });
   if (tab === 'fixture') {
@@ -7804,6 +7817,7 @@ function scrollAProximaFecha() {
   <div class="tab active" onclick="showTab('fixture')">📋 Fixture</div>
   <div class="tab" onclick="showTab('posiciones')">📊 Posiciones</div>
   <div class="tab" onclick="showTab('equipos')">🏅 Equipos</div>
+  <div class="tab" onclick="showTab('reglamento')">📜 Reglamento</div>
 </div>
 </div><!-- /#topbar -->
 
@@ -7811,6 +7825,42 @@ function scrollAProximaFecha() {
   <div id="tab-fixture"></div>
   <div id="tab-posiciones" style="display:none"></div>
   <div id="tab-equipos" style="display:none"></div>
+  <div id="tab-reglamento" style="display:none">
+    <div class="reglamento">
+      <section class="reg-bloque">
+        <h2>FASE REGULAR</h2>
+        <ol>
+          <li>La Fase Regular se disputará con el sistema todos contra todos, entre los equipos participantes de la competencia.</li>
+          <li>Finalizada la Fase Regular, los equipos clasificados entre el 1° y el 8° puesto clasificarán para los Play-Off.</li>
+        </ol>
+      </section>
+      <section class="reg-bloque">
+        <h2>PUNTOS OTORGADOS A CADA EQUIPO POR PARTIDO EN FASE REGULAR</h2>
+        <ol>
+          <li>Resultado 3-0 y 3-1: 3 (tres) puntos al ganador y 0 (cero) puntos al perdedor.</li>
+          <li>Resultado 3-2: 2 (dos) puntos al ganador y 1 (un) punto al perdedor.</li>
+        </ol>
+      </section>
+      <section class="reg-bloque">
+        <h2>CRITERIOS DE DESEMPATE EN TABLA DE POSICIONES</h2>
+        <ol>
+          <li><b>CANTIDAD DE PARTIDOS GANADOS:</b> en caso que dos (2) o más equipos hubiesen obtenido los mismos puntos, la clasificación se definirá por la mayor cantidad de partidos ganados.</li>
+          <li><b>COEFICIENTE DE SETS:</b> si el empate persistiese, la clasificación se definirá por el cociente que resulte de dividir el número total de sets ganados por el número total de sets perdidos.</li>
+          <li><b>COEFICIENTE DE TANTOS:</b> si el empate persistiese, la clasificación se definirá por el cociente que resulte de dividir el total de tantos anotados por el total de tantos recibidos (durante todos los partidos disputados en fase regular).</li>
+          <li><b>RESULTADO DE PARTIDOS ENTRE ELLOS:</b> si el empate persistiese, la clasificación se definirá por el resultado de los partidos entre los equipos igualados.</li>
+          <li><b>COEFICIENTE DE SETS DE LOS PARTIDOS ENTRE ELLOS:</b> si el empate persistiese, la clasificación se definirá por el “Coeficiente de sets” en los partidos jugados entre ellos.</li>
+          <li><b>COEFICIENTE DE TANTOS DE LOS PARTIDOS ENTRE ELLOS:</b> si el empate persistiese, la clasificación se definirá por el “Coeficiente de tantos” en los partidos jugados entre ellos.</li>
+          <li><b>SORTEO:</b> si el empate persistiese, se realizará un sorteo entre los equipos involucrados.</li>
+        </ol>
+      </section>
+      <section class="reg-bloque">
+        <h2>TRIBUNAL DE DISCIPLINA</h2>
+        <ol>
+          <li>Será conformado por la Dirección de Deportes de Santa Rosa.</li>
+        </ol>
+      </section>
+    </div>
+  </div>
 </main>
 
 <!-- Modal contraseña -->
