@@ -7655,37 +7655,30 @@ function renderEquipos() {
 // PLAYOFFS AUTOMÁTICOS
 // =============================================
 function actualizarPlayoffs() {
-  // Toma el Top 8 de cada género y completa los cruces de cuartos
+  // Asigna los cuartos de final según la tabla actual (Top 8 de cada género).
+  // Cruces fijos por ID de partido: 1°vs8°, 2°vs7°, 3°vs6°, 4°vs5°.
+  // Se recalculan siempre mientras el partido NO tenga resultado cargado;
+  // una vez jugado, el cruce queda congelado.
+  const CRUCES = {
+    F: { QF1: [0, 7], QF2: [1, 6], QF3: [2, 5], QF4: [3, 4] },
+    M: { QM1: [0, 7], QM2: [1, 6], QM3: [2, 5], QM4: [3, 4] }
+  };
+
   ['F','M'].forEach(gen => {
     const tabla = calcularPosiciones(gen);
     if (tabla.length < 8) return; // no hay suficientes equipos con partidos
-
-    // Los 8 primeros
     const top = tabla.slice(0, 8);
-
-    // Buscar los partidos de cuartos de final de este género
-    // Cruces: 1°vs8°, 2°vs7°, 3°vs6°, 4°vs5°
-    const cruces = [
-      [0, 7], [1, 6], [2, 5], [3, 4]
-    ];
 
     fixture.forEach(fecha => {
       if (!fecha.esPlayoff) return;
       fecha.partidos.forEach(p => {
-        if (p.gen !== gen) return;
-        if (!p.playoff) return;
-        // Solo actualiza si el local todavía es un placeholder (contiene "°")
-        // y el partido no tiene resultado aún
-        if (p.res_l !== null || p.res_v !== null) return;
-
-        cruces.forEach(([i, j], ci) => {
-          const placeholder1 = `${i+1}° (${gen})`;
-          const placeholder2 = `${j+1}° (${gen})`;
-          if (p.local === placeholder1 && p.visitante === placeholder2) {
-            if (top[i]) p.local = top[i].club;
-            if (top[j]) p.visitante = top[j].club;
-          }
-        });
+        if (p.gen !== gen || !p.playoff) return;
+        const cruce = CRUCES[gen][p.id];
+        if (!cruce) return; // semis / finales usan "Gan. N°..."
+        if (p.res_l !== null || p.res_v !== null) return; // ya jugado
+        const [i, j] = cruce;
+        p.local = top[i].club;
+        p.visitante = top[j].club;
       });
     });
   });
