@@ -6485,6 +6485,7 @@ let partidoMover = null;
 // RENDER
 // =============================================
 function renderFixture() {
+  _cacheTop8 = {};
   actualizarPlayoffs();
   const cont = document.getElementById('tab-fixture');
   cont.innerHTML = '';
@@ -6756,21 +6757,25 @@ function renderPartido(p, fecha) {
     equiposDiv.appendChild(visSpan);
   }
 
-  // Posición en la tabla (cuartos de final: 1°vs8°, 2°vs7°, ...)
-  const cruceSeed = p.playoff && CRUCES[p.gen] && CRUCES[p.gen][p.id];
-  if (cruceSeed) {
-    const seeds = document.createElement('div');
-    seeds.className = 'partido-seeds';
-    const mk = (n) => {
-      const s = document.createElement('span');
-      s.className = 'seed-pos';
-      s.textContent = `${n}° de la tabla`;
-      return s;
-    };
-    seeds.appendChild(mk(cruceSeed[0] + 1));
-    seeds.appendChild(document.createElement('span'));
-    seeds.appendChild(mk(cruceSeed[1] + 1));
-    medio.appendChild(seeds);
+  // Posición en la tabla de cada equipo en los playoffs
+  if (p.playoff) {
+    const sl = seedsDeSlot(p, 0), sv = seedsDeSlot(p, 1);
+    if (sl.length || sv.length) {
+      const seeds = document.createElement('div');
+      seeds.className = 'partido-seeds';
+      const mk = (arr) => {
+        const s = document.createElement('span');
+        if (arr.length) {
+          s.className = 'seed-pos';
+          s.textContent = arr.map(n => n + '°').join(' / ');
+        }
+        return s;
+      };
+      seeds.appendChild(mk(sl));
+      seeds.appendChild(document.createElement('span'));
+      seeds.appendChild(mk(sv));
+      medio.appendChild(seeds);
+    }
   }
 
   medio.appendChild(equiposDiv);
@@ -7710,6 +7715,43 @@ const CRUCES = {
   F: { QF1: [0, 7], QF2: [1, 6], QF3: [2, 5], QF4: [3, 4] },
   M: { QM1: [0, 7], QM2: [1, 6], QM3: [2, 5], QM4: [3, 4] }
 };
+// Posiciones (1..8) posibles para un lado de un partido de playoff.
+// side: 0 = local, 1 = visitante. Devuelve [] si no se puede determinar.
+let _cacheTop8 = {};
+function top8Pos(gen, nombre) {
+  if (!_cacheTop8[gen]) {
+    const tabla = calcularPosiciones(gen);
+    _cacheTop8[gen] = tabla.length >= 8
+      ? tabla.slice(0, 8).map(t => String(t.club).trim().toUpperCase())
+      : [];
+  }
+  const i = _cacheTop8[gen].indexOf(String(nombre || '').trim().toUpperCase());
+  return i >= 0 ? i + 1 : null;
+}
+function seedsDeSlot(p, side, prof) {
+  prof = prof || 0;
+  if (prof > 5) return [];
+  const cruce = CRUCES[p.gen] && CRUCES[p.gen][p.id];
+  if (cruce) return [cruce[side] + 1];
+  const nombre = side === 0 ? p.local : p.visitante;
+  const pos = top8Pos(p.gen, nombre);
+  if (pos) return [pos];
+  const m = String(nombre || '').match(/^\s*(Gan|Perd)\.?\s*N°\s*(\d+)/i);
+  if (!m) return [];
+  let ref = null;
+  fixture.forEach(f => f.partidos.forEach(q => {
+    if (q.gen === p.gen && String(q.num).replace(/\D/g, '') === m[2]) ref = q;
+  }));
+  if (!ref) return [];
+  const L = seedsDeSlot(ref, 0, prof + 1), V = seedsDeSlot(ref, 1, prof + 1);
+  if (ref.res_l !== null && ref.res_v !== null && ref.res_l !== ref.res_v) {
+    const ganaLocal = ref.res_l > ref.res_v;
+    const esGan = m[1].toLowerCase() === 'gan';
+    return (ganaLocal === esGan) ? L : V;
+  }
+  return [...new Set([...L, ...V])].sort((a, b) => a - b);
+}
+
 function actualizarPlayoffs() {
   // Asigna los cuartos de final según la tabla actual (Top 8 de cada género).
   // Cruces fijos por ID de partido: 1°vs8°, 2°vs7°, 3°vs6°, 4°vs5°.
