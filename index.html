@@ -457,6 +457,28 @@
     margin-top: 4px;
   }
 
+  /* POSICIÓN EN TABLA (CRUCES PLAYOFF) */
+  .partido-seeds {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 2px;
+    width: 100%;
+    margin-bottom: 2px;
+  }
+  .partido-seeds > span:nth-child(2) { width: 22px; }
+  .seed-pos {
+    justify-self: center;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #92400e;
+    background: var(--dorado-suave);
+    padding: 1px 7px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+
   /* BADGE PLAYOFF */
   .badge-playoff {
     font-size: 0.65rem;
@@ -6734,6 +6756,23 @@ function renderPartido(p, fecha) {
     equiposDiv.appendChild(visSpan);
   }
 
+  // Posición en la tabla (cuartos de final: 1°vs8°, 2°vs7°, ...)
+  const cruceSeed = p.playoff && CRUCES[p.gen] && CRUCES[p.gen][p.id];
+  if (cruceSeed) {
+    const seeds = document.createElement('div');
+    seeds.className = 'partido-seeds';
+    const mk = (n) => {
+      const s = document.createElement('span');
+      s.className = 'seed-pos';
+      s.textContent = `${n}° de la tabla`;
+      return s;
+    };
+    seeds.appendChild(mk(cruceSeed[0] + 1));
+    seeds.appendChild(document.createElement('span'));
+    seeds.appendChild(mk(cruceSeed[1] + 1));
+    medio.appendChild(seeds);
+  }
+
   medio.appendChild(equiposDiv);
 
   // RESULTADO — fila simple centrada: resL - resV
@@ -7667,16 +7706,15 @@ function renderEquipos() {
 // =============================================
 // PLAYOFFS AUTOMÁTICOS
 // =============================================
+const CRUCES = {
+  F: { QF1: [0, 7], QF2: [1, 6], QF3: [2, 5], QF4: [3, 4] },
+  M: { QM1: [0, 7], QM2: [1, 6], QM3: [2, 5], QM4: [3, 4] }
+};
 function actualizarPlayoffs() {
   // Asigna los cuartos de final según la tabla actual (Top 8 de cada género).
   // Cruces fijos por ID de partido: 1°vs8°, 2°vs7°, 3°vs6°, 4°vs5°.
   // Se recalculan siempre mientras el partido NO tenga resultado cargado;
   // una vez jugado, el cruce queda congelado.
-  const CRUCES = {
-    F: { QF1: [0, 7], QF2: [1, 6], QF3: [2, 5], QF4: [3, 4] },
-    M: { QM1: [0, 7], QM2: [1, 6], QM3: [2, 5], QM4: [3, 4] }
-  };
-
   ['F','M'].forEach(gen => {
     const tabla = calcularPosiciones(gen);
     if (tabla.length < 8) return; // no hay suficientes equipos con partidos
