@@ -6721,7 +6721,10 @@ function renderPartido(p, fecha) {
     const localInput = document.createElement('input');
     localInput.className = 'nombre-local';
     localInput.value = p.local;
-    localInput.onchange = (e) => { p.local = e.target.value; };
+    localInput.onchange = (e) => {
+      p.local = e.target.value;
+      if (RE_REF_PLAYOFF.test(p.local)) p.ref_l = p.local; else if (p.playoff) p.ref_l = null; // edición manual
+    };
     equiposDiv.appendChild(localInput);
 
     const vs = document.createElement('span');
@@ -6732,7 +6735,10 @@ function renderPartido(p, fecha) {
     const visInput = document.createElement('input');
     visInput.className = 'nombre-visit';
     visInput.value = p.visitante;
-    visInput.onchange = (e) => { p.visitante = e.target.value; };
+    visInput.onchange = (e) => {
+      p.visitante = e.target.value;
+      if (RE_REF_PLAYOFF.test(p.visitante)) p.ref_v = p.visitante; else if (p.playoff) p.ref_v = null;
+    };
     equiposDiv.appendChild(visInput);
   } else {
     const localSpan = document.createElement('span');
@@ -6821,6 +6827,12 @@ function renderPartido(p, fecha) {
   resL.addEventListener('change', actualizarVisual);
   resV.addEventListener('input', actualizarVisual);
   resV.addEventListener('change', actualizarVisual);
+  if (p.playoff) {
+    // Al confirmar un resultado de playoff, avanzar ganadores/perdedores
+    const avanzar = () => { const y = window.scrollY; renderFixture(); window.scrollTo(0, y); };
+    resL.addEventListener('change', avanzar);
+    resV.addEventListener('change', avanzar);
+  }
 
   resRow.appendChild(resL);
   resRow.appendChild(sep);
@@ -7733,7 +7745,7 @@ function seedsDeSlot(p, side, prof) {
   if (prof > 5) return [];
   const cruce = CRUCES[p.gen] && CRUCES[p.gen][p.id];
   if (cruce) return [cruce[side] + 1];
-  const nombre = side === 0 ? p.local : p.visitante;
+  const nombre = (side === 0 ? p.ref_l : p.ref_v) || (side === 0 ? p.local : p.visitante);
   const pos = top8Pos(p.gen, nombre);
   if (pos) return [pos];
   const m = String(nombre || '').match(/^\s*(Gan|Perd)\.?\s*N°\s*(\d+)/i);
@@ -7775,6 +7787,42 @@ function actualizarPlayoffs() {
       });
     });
   });
+
+  // Semis, 3er puesto y finales: reemplaza "Gan./Perd. N°X" por el equipo
+  // real cuando el partido X ya tiene resultado. La referencia original se
+  // guarda en p.ref_l / p.ref_v para poder volver atrás si se borra el resultado.
+  // Dos pasadas para que las cadenas (cuartos → semis → finales) se resuelvan.
+  for (let pasada = 0; pasada < 2; pasada++) {
+    fixture.forEach(fecha => {
+      if (!fecha.esPlayoff) return;
+      fecha.partidos.forEach(p => {
+        if (!p.playoff || (CRUCES[p.gen] && CRUCES[p.gen][p.id])) return;
+        ['l', 'v'].forEach(s => {
+          const campo = s === 'l' ? 'local' : 'visitante';
+          if (p['ref_' + s] === undefined && RE_REF_PLAYOFF.test(p[campo] || ''))
+            p['ref_' + s] = p[campo];
+          const ref = p['ref_' + s];
+          if (!ref) return;
+          if (p.res_l !== null || p.res_v !== null) return; // ya jugado: congelado
+          p[campo] = resolverRefPlayoff(p.gen, ref) || ref;
+        });
+      });
+    });
+  }
+}
+
+const RE_REF_PLAYOFF = /^\s*(Gan|Perd)\.?\s*N°\s*(\d+)/i;
+function resolverRefPlayoff(gen, ref) {
+  const m = String(ref).match(RE_REF_PLAYOFF);
+  if (!m) return null;
+  let q = null;
+  fixture.forEach(f => f.partidos.forEach(x => {
+    if (x.gen === gen && String(x.num).replace(/\D/g, '') === m[2]) q = x;
+  }));
+  if (!q || q.res_l === null || q.res_v === null || q.res_l === q.res_v) return null;
+  const ganaLocal = q.res_l > q.res_v;
+  const nombre = (ganaLocal === (m[1].toLowerCase() === 'gan')) ? q.local : q.visitante;
+  return RE_REF_PLAYOFF.test(nombre) ? null : nombre; // aún no definido
 }
 
 
