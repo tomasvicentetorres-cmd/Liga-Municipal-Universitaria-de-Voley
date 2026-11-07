@@ -6763,8 +6763,8 @@ function renderPartido(p, fecha) {
     equiposDiv.appendChild(visSpan);
   }
 
-  // Posición en la tabla de cada equipo (solo cuartos y semifinales)
-  if (p.playoff && !/^(3[FM]|FIN)/.test(p.id)) {
+  // Posición en la tabla de cada equipo (solo cuartos de final)
+  if (p.playoff && CRUCES[p.gen] && CRUCES[p.gen][p.id]) {
     const sl = seedsDeSlot(p, 0), sv = seedsDeSlot(p, 1);
     if (sl.length || sv.length) {
       const seeds = document.createElement('div');
