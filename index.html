@@ -6829,10 +6829,25 @@ function renderPartido(p, fecha) {
   resV.addEventListener('change', actualizarVisual);
   if (p.playoff) {
     // Al confirmar un resultado de playoff, avanzar ganadores/perdedores
-    const avanzar = () => { const y = window.scrollY; renderFixture(); window.scrollTo(0, y); };
+    // Se difiere el re-render para no perder el foco al pasar con Tab
+    const avanzar = () => setTimeout(() => {
+      const act = document.activeElement;
+      const pid = act && act.dataset ? act.dataset.pid : null;
+      const campo = act && act.dataset ? act.dataset.campo : null;
+      const y = window.scrollY;
+      renderFixture();
+      window.scrollTo(0, y);
+      if (pid && campo) {
+        const el = document.querySelector(`[data-pid="${CSS.escape(pid)}"][data-campo="${campo}"]`);
+        if (el) { el.focus(); if (el.select) el.select(); }
+      }
+    }, 0);
     resL.addEventListener('change', avanzar);
     resV.addEventListener('change', avanzar);
   }
+
+  resL.dataset.pid = p.id; resL.dataset.campo = 'rl'; resL.classList.add('tab-res');
+  resV.dataset.pid = p.id; resV.dataset.campo = 'rv'; resV.classList.add('tab-res');
 
   resRow.appendChild(resL);
   resRow.appendChild(sep);
@@ -6878,6 +6893,7 @@ function renderPartido(p, fecha) {
       inp1.value = set[0];
       inp1.disabled = !modoEdicion;
       inp1.oninput = (e) => { p.sets[idx][0] = parseInt(e.target.value)||0; };
+      inp1.dataset.pid = p.id; inp1.dataset.campo = 's' + idx + 'a'; inp1.classList.add('tab-res');
       item.appendChild(inp1);
 
       const s = document.createElement('span');
@@ -6891,6 +6907,7 @@ function renderPartido(p, fecha) {
       inp2.value = set[1];
       inp2.disabled = !modoEdicion;
       inp2.oninput = (e) => { p.sets[idx][1] = parseInt(e.target.value)||0; };
+      inp2.dataset.pid = p.id; inp2.dataset.campo = 's' + idx + 'b'; inp2.classList.add('tab-res');
       item.appendChild(inp2);
 
       if (modoEdicion) {
@@ -6955,6 +6972,22 @@ function renderPartido(p, fecha) {
   card.appendChild(medio);
   return card;
 }
+
+// Tab / Shift+Tab: recorre resultado local → visitante → sets (a-b) → siguiente partido
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Tab' || e.altKey || e.ctrlKey || e.metaKey) return;
+  const act = document.activeElement;
+  if (!act || !act.classList || !act.classList.contains('tab-res')) return;
+  const lista = Array.from(document.querySelectorAll('input.tab-res'))
+    .filter(el => !el.disabled && el.offsetParent !== null);
+  const i = lista.indexOf(act);
+  if (i === -1) return;
+  const sig = lista[i + (e.shiftKey ? -1 : 1)];
+  if (!sig) return; // fin de la lista: comportamiento normal
+  e.preventDefault();
+  sig.focus();
+  try { sig.select(); } catch (_) {}
+});
 
 function actualizarGanadorClase(resL, resV, p) {
   resL.classList.toggle('ganador', p.res_l !== null && p.res_v !== null && p.res_l > p.res_v);
@@ -7853,36 +7886,43 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function parseFecha(str) {
-  const parts = str.split('/');
+  // Acepta "20/11/2026" y rangos "19-20/11/2026". Devuelve el primer día.
+  const r = parseRangoFecha(str);
+  return r ? r.ini : null;
+}
+
+function parseRangoFecha(str) {
+  const parts = String(str || '').split('/');
   if (parts.length !== 3) return null;
-  return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+  const mes = parseInt(parts[1]) - 1, anio = parseInt(parts[2]);
+  const dias = parts[0].split('-').map(x => parseInt(x)).filter(n => !isNaN(n));
+  if (!dias.length) return null;
+  const ini = new Date(anio, mes, dias[0]);
+  const fin = new Date(anio, mes, dias[dias.length - 1]);
+  return { ini, fin };
 }
 
 function scrollAProximaFecha() {
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
+  const t = hoy.getTime();
 
   let fechaTarget = null;
   let menorDiff = Infinity;
 
-  // Primero buscar si hoy mismo tiene partidos
+  // Primero buscar si hoy cae dentro de una fecha (o de un rango "19-20/11")
   fixture.forEach(f => {
-    const d = parseFecha(f.fecha);
-    if (!d) return;
-    d.setHours(0, 0, 0, 0);
-    if (d.getTime() === hoy.getTime()) {
-      fechaTarget = f.id;
-      menorDiff = 0;
-    }
+    if (fechaTarget) return;
+    const r = parseRangoFecha(f.fecha);
+    if (r && r.ini.getTime() <= t && t <= r.fin.getTime()) fechaTarget = f.id;
   });
 
   // Si no hay partidos hoy, buscar la próxima fecha futura más cercana
   if (!fechaTarget) {
     fixture.forEach(f => {
-      const d = parseFecha(f.fecha);
-      if (!d) return;
-      d.setHours(0, 0, 0, 0);
-      const diff = d - hoy;
+      const r = parseRangoFecha(f.fecha);
+      if (!r) return;
+      const diff = r.ini.getTime() - t;
       if (diff > 0 && diff < menorDiff) { menorDiff = diff; fechaTarget = f.id; }
     });
   }
@@ -7891,10 +7931,9 @@ function scrollAProximaFecha() {
   if (!fechaTarget) {
     let mayorPasado = -Infinity;
     fixture.forEach(f => {
-      const d = parseFecha(f.fecha);
-      if (!d) return;
-      d.setHours(0, 0, 0, 0);
-      const diff = d - hoy;
+      const r = parseRangoFecha(f.fecha);
+      if (!r) return;
+      const diff = r.fin.getTime() - t;
       if (diff < 0 && diff > mayorPasado) { mayorPasado = diff; fechaTarget = f.id; }
     });
   }
